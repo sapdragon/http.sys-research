@@ -2,7 +2,7 @@
  A small research of http.sys
 
 ## Description
- This is a small research of http.sys. I was able to find a few bugs in it, but I don't have time to finish them. I hope this will help someone.
+ This is a small study of http.sys. I was able to do some research on it, but I don't have time to finish them. I hope this will help someone.
 
 ## Vulnerabilities
     I haven't spent enough time researching, but it is suggested that the CVE on LCE is in UlCaptureChannelBindConfig
