@@ -5,7 +5,7 @@
  This is a small study of http.sys. I was able to do some research on it, but I don't have time to finish them. I hope this will help someone.
 
 ## Vulnerabilities
-The CVE-2023-23410 vulnerability consists of a Service name size overflow. You need to pass more than WORD, and call check via UlIsChannelBindChangeNeeded, then size is copied to WORD, and memori corpus is called when copying string in UNICODE with ASCII.
+The CVE-2023-23410 vulnerability consists of a Service name size overflow. You need to pass more than WORD, and call check via UlIsChannelBindChangeNeeded, then size is copied to WORD, and memory corruption called when copying string in UNICODE with ASCII.
 
 
 # About other files
