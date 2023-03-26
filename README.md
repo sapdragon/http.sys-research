@@ -5,7 +5,7 @@
  This is a small study of http.sys. I was able to do some research on it, but I don't have time to finish them. I hope this will help someone.
 
 ## Vulnerabilities
-    I haven't spent enough time researching, but it is suggested that the CVE on LCE is in UlCaptureChannelBindConfig
+The CVE-2023-23410 vulnerability consists of a Service name size overflow. You need to pass more than WORD, and call check via UlIsChannelBindChangeNeeded, then size is copied to WORD, and memori corpus is called when copying string in UNICODE with ASCII.
 
 
 # About other files
@@ -32,11 +32,16 @@
  ### UlCopyAuthConfig
      Copies authentication settings (flags, schemes, reals, domains).
  ### UlpCaptureDigestParams
-     Handles HTTP_SERVER_AUTHENTICATION_DIGEST_PARAMS from HTTP_SERVER_AUTHENTICATION_INFO. ( Is there a vulnerability?)
+     Handles HTTP_SERVER_AUTHENTICATION_DIGEST_PARAMS from HTTP_SERVER_AUTHENTICATION_INFO.
  ### UlpCaptureBasicParams
-     Handles HTTP_SERVER_AUTHENTICATION_BASIC_PARAMS from HTTP_SERVER_AUTHENTICATION_INFO. ( Is there a vulnerability?)
+     Handles HTTP_SERVER_AUTHENTICATION_BASIC_PARAMS from HTTP_SERVER_AUTHENTICATION_INFO.
  ### UlIsChannelBindChangeNeeded
     Compares 2 bind configs, and sets 3 argument result ( 1 if different )
+ ### UlpIsServiceContainerEquivalent
+    Compares all Service Name in the container. 
+ ### UlExtractAndAppendAuthenticationResponseInfo
+    Extracts authentication information from the request, and checks it 
+
 The rest has either not been researched enough or is unimportant.
 ## Other
     \\Device\\Http\\Communication
