@@ -1,51 +1,115 @@
-# http.sys research
- A small research of http.sys
+# http.sys Research
+
+A comprehensive study of the http.sys driver
 
 ## Description
- This is a small study of http.sys. I was able to do some research on it, but I don't have time to finish them. I hope this will help someone.
+
+This document presents a concise investigation into http.sys. While the research is not exhaustive, it aims to provide valuable insights for further exploration.
 
 ## Vulnerabilities
-The CVE-2023-23410 vulnerability consists of a Service name size overflow. You need to pass more than WORD, and call check via UlIsChannelBindChangeNeeded, then size is copied to WORD, and memory corruption called when copying string in UNICODE with ASCII.
 
+### CVE-2023-23410
 
-# About other files
-  ## Binary
-    Here you can find drivers of different versions, as well as httpapi.dll ( Not at the moment, but I will add it soon )
-  ## Research
-    Here are the decompiled researched functions of the driver. I hope it will help someone.
-# Driver research
-## Communication with the driver
- The driver communicates with the user mode application using IOCTLs. Between all this there is a layer in the form of httpapi.dll
-## Functions
- ### UlCaptureChannelBindConfig
-    This function is for configuring channel authentication. It is accessed either through http reqest handling or through setting for group ( IOCTL code: 0x12801D, or session ( IOCTL code: 0x12800D). You can also find versions of them in the repository. 
- ### UlpAllocateServiceNameContainer
-    As the name implies, it allocates a container for server names. The only argument is the number of server names, if more than 64 it returns 0, instead of the allocated memory address (Allocate via ExAllocatePool3)
- ### UlpAddServiceNameToContainer
-    It has 4 arguments (the first is the address of the allocation container, the second is the service name address, the third is the service name buffer, the fourth is the buffer length), it checks the length to avoid integer overflow ( For x64: pServiceNameLen >= 0xFFFFFFFFE8, for x86: 0xFFFFFFFFF4). If the length is valid, it allocates the length + 24 ( x86: 12 ), and writes to the container.
- ### UlpIsChannelBindConfigValid
-    Again judging from the name, it validates the config, i.e. checks the flags for compatibility, and then goes through the whole buffer, checks if there is ".", if not it return false.
- ### UlCopyChannelBindConfig
-    Copies the bind config, first argument from where, second argument to where.
- ### UlSetServerSessionProperty
-     You can see by the name, it is only called in IOCTL handler (the correct name?)
- ### UlCopyAuthConfig
-     Copies authentication settings (flags, schemes, reals, domains).
- ### UlpCaptureDigestParams
-     Handles HTTP_SERVER_AUTHENTICATION_DIGEST_PARAMS from HTTP_SERVER_AUTHENTICATION_INFO.
- ### UlpCaptureBasicParams
-     Handles HTTP_SERVER_AUTHENTICATION_BASIC_PARAMS from HTTP_SERVER_AUTHENTICATION_INFO.
- ### UlIsChannelBindChangeNeeded
-    Compares 2 bind configs, and sets 3 argument result ( 1 if different )
- ### UlpIsServiceContainerEquivalent
-    Compares all Service Name in the container. 
- ### UlExtractAndAppendAuthenticationResponseInfo
-    Extracts authentication information from the request, and checks it 
+This vulnerability involves a Service name size overflow. The exploitation process is as follows:
+1. Pass a value larger than WORD
+2. Call the check via `UlIsChannelBindChangeNeeded`
+3. The size is then copied to WORD
+4. Memory corruption occurs when copying a string in UNICODE with ASCII
 
-The rest has either not been researched enough or is unimportant.
-## Other
-    \\Device\\Http\\Communication
-    \\Device\\Http\\ClientSession
-    \\Device\\Http\\ReqQueue
+## File Structure
 
+### Binary
 
+This directory contains:
+- Drivers of different versions
+- httpapi.dll (To be added soon)
+
+### Research
+
+This section includes decompiled and analyzed functions of the driver, intended to assist further research.
+
+## Driver Analysis
+
+### Driver Communication
+
+The driver communicates with user-mode applications using IOCTLs. httpapi.dll serves as an intermediary layer in this process.
+
+### Key Functions
+
+#### UlCaptureChannelBindConfig
+
+Purpose: Configures channel authentication
+Access: Through HTTP request handling or setting for:
+- Group (IOCTL code: 0x12801D)
+- Session (IOCTL code: 0x12800D)
+
+#### UlpAllocateServiceNameContainer
+
+- Allocates a container for server names
+- Single argument: number of server names
+- Returns 0 if more than 64 names, otherwise returns allocated memory address
+- Memory allocation via ExAllocatePool3
+
+#### UlpAddServiceNameToContainer
+
+Arguments:
+1. Address of allocation container
+2. Service name address
+3. Service name buffer
+4. Buffer length
+
+Function:
+- Checks length to prevent integer overflow
+  - x64: pServiceNameLen >= 0xFFFFFFFFE8
+  - x86: 0xFFFFFFFFF4
+- If valid, allocates memory (length + 24 for x64, length + 12 for x86)
+- Writes to the container
+
+#### UlpIsChannelBindConfigValid
+
+- Validates config
+- Checks flags for compatibility
+- Scans buffer for "."
+- Returns false if "." is not found
+
+#### UlCopyChannelBindConfig
+
+Copies bind config from source to destination
+
+#### UlSetServerSessionProperty
+
+Called in IOCTL handler (naming accuracy to be confirmed)
+
+#### UlCopyAuthConfig
+
+Copies authentication settings (flags, schemes, realms, domains)
+
+#### UlpCaptureDigestParams
+
+Processes HTTP_SERVER_AUTHENTICATION_DIGEST_PARAMS from HTTP_SERVER_AUTHENTICATION_INFO
+
+#### UlpCaptureBasicParams
+
+Handles HTTP_SERVER_AUTHENTICATION_BASIC_PARAMS from HTTP_SERVER_AUTHENTICATION_INFO
+
+#### UlIsChannelBindChangeNeeded
+
+- Compares two bind configs
+- Sets third argument result (1 if different)
+
+#### UlpIsServiceContainerEquivalent
+
+Compares all Service Names in the container
+
+#### UlExtractAndAppendAuthenticationResponseInfo
+
+Extracts and verifies authentication information from the request
+
+Note: Other functions are either insufficiently researched or deemed less significant.
+
+## Additional Information
+
+Relevant device paths:
+- `\\Device\\Http\\Communication`
+- `\\Device\\Http\\ClientSession`
+- `\\Device\\Http\\ReqQueue`
